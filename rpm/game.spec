@@ -13,12 +13,12 @@
 Name:       %{_app_orgname}.%{_app_appname}
 Summary:    Love2D Game Engine
 Release:    1
-Version:    12.0.0
+Version:    11.3.0
 Group:      Amusements/Games
 License:    zlib
 Source0:    %{name}.tar.gz
 
-%define __requires_exclude ^libvorbis.*\\.so.*|libopenal\\.so.*|libfreetype\\.so.*|libharfbuzz\\.so.*|libmodplug\\.so.*|libtheora\\.so.*|libtheoradec\\.so.*|libgraphite2\\.so.*|liblove-12\\.0\\.so.*$
+%define __requires_exclude ^libvorbis.*\\.so.*|libopenal\\.so.*|libmpg123\\.so.*|libfreetype\\.so.*|libharfbuzz\\.so.*|libmodplug\\.so.*|libtheora\\.so.*|libtheoradec\\.so.*|libgraphite2\\.so.*|libliblove\\.so.*$
 %define __provides_exclude_from ^%{_datadir}/%{name}/lib/.*\\.so.*$
 
 BuildRequires: pkgconfig(sdl2)
@@ -28,6 +28,7 @@ BuildRequires: pkgconfig(theoradec)
 BuildRequires: pkgconfig(vorbis)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: pkgconfig(freetype2)
+BuildRequires: pkgconfig(libmpg123)
 BuildRequires: rsync
 BuildRequires: patchelf
 
@@ -60,20 +61,21 @@ pushd LuaJIT
 make -j`nproc`
 popd
 
-cmake -E env LDFLAGS="-Wl,-rpath,%{_datadir}/%{name}/lib" cmake \
+cmake \
     -Bbuild_love_%{_arch} \
+    -DAURORAOS=YES \
     -DCMAKE_BUILD_TYPE=Debug \
     -DMODPLUG_INCLUDE_DIR=build_libmodplug_%{_arch}/usr/local/include \
     -DMODPLUG_LIBRARY=build_libmodplug_%{_arch}/libmodplug.so.1.0.0 \
     -DLUAJIT_INCLUDE_DIR=LuaJIT/src/ \
     -DLUAJIT_LIBRARY=LuaJIT/src/libluajit.a \
     -DLOVE_EXE_NAME=%{name} \
-    -DLOVE_LIB_NAME="love-12.0" \
+    -DLOVE_LIB_NAME="love-11.0" \
     love
-
 pushd build_love_%{_arch}
 make -j`nproc`
 popd
+
 
 %install
 install -D %{_libdir}/libgraphite2.so* -t %{buildroot}%{_datadir}/%{name}/lib
@@ -83,12 +85,13 @@ install -D %{_libdir}/libtheoradec.so* -t %{buildroot}%{_datadir}/%{name}/lib
 install -D %{_libdir}/libvorbisfile.so* -t %{buildroot}%{_datadir}/%{name}/lib
 install -D %{_libdir}/libopenal.so* -t %{buildroot}%{_datadir}/%{name}/lib
 install -D %{_libdir}/libfreetype.so* -t %{buildroot}%{_datadir}/%{name}/lib
+install -D %{_libdir}/libmpg123.so* -t %{buildroot}%{_datadir}/%{name}/lib
 
 install -D -s build_libmodplug_%{_arch}/libmodplug.so.1* -t %{buildroot}%{_datadir}/%{name}/lib
-patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/liblove-12.0.so
-install -D -s build_love_%{_arch}/liblove-12.0.so -t %{buildroot}%{_datadir}/%{name}/lib
-patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/%{name}
-install -D -s build_love_%{_arch}/%{name}  %{buildroot}%{_bindir}/%{name}
+patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/libliblove.so
+install -D -s build_love_%{_arch}/libliblove.so -t %{buildroot}%{_datadir}/%{name}/lib
+patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/love
+install -D -s build_love_%{_arch}/love  %{buildroot}%{_bindir}/%{name}
 install -m 655 -D icons/86.png  %{buildroot}%{_datadir}/icons/hicolor/86x86/apps/%{name}.png
 install -m 655 -D icons/108.png %{buildroot}%{_datadir}/icons/hicolor/108x108/apps/%{name}.png
 install -m 655 -D icons/128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/%{name}.png
