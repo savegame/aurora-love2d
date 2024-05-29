@@ -39,12 +39,11 @@ and AuroraOS."
 %prep
 %setup -q -n %{name}-%{version}
 
-pushd libmodplug
-cmake -Bbuild_%{_arch} \
+cmake -Bbuild_libmodplug_%{_arch} \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
-    .
-popd
+    libmodplug
+
 # clean previous build data in LuaJIT
 pushd LuaJIT
 make clean 
@@ -52,7 +51,7 @@ popd
 
 
 %build
-pushd libmodplug/build_%{_arch}
+pushd build_libmodplug_%{_arch}
 make -j`nproc`
 make DESTDIR=`pwd` install
 popd 
@@ -61,20 +60,19 @@ pushd LuaJIT
 make -j`nproc`
 popd
 
-pushd love
 cmake -E env LDFLAGS="-Wl,-rpath,%{_datadir}/%{name}/lib" cmake \
-    -Bbuild_%{_arch} \
+    -Bbuild_love_%{_arch} \
     -DCMAKE_BUILD_TYPE=Debug \
-    -DMODPLUG_INCLUDE_DIR=../libmodplug/build_%{_arch}/usr/local/include \
-    -DMODPLUG_LIBRARY=../libmodplug/build_%{_arch}/libmodplug.so.1.0.0 \
-    -DLUAJIT_INCLUDE_DIR=../LuaJIT/src/ \
-    -DLUAJIT_LIBRARY=../LuaJIT/src/libluajit.a \
+    -DMODPLUG_INCLUDE_DIR=build_libmodplug_%{_arch}/usr/local/include \
+    -DMODPLUG_LIBRARY=build_libmodplug_%{_arch}/libmodplug.so.1.0.0 \
+    -DLUAJIT_INCLUDE_DIR=LuaJIT/src/ \
+    -DLUAJIT_LIBRARY=LuaJIT/src/libluajit.a \
     -DLOVE_EXE_NAME=%{name} \
     -DLOVE_LIB_NAME="love-12.0" \
-    .
-    pushd build_%{_arch}
-    make -j`nproc`
-    popd
+    love
+
+pushd build_love_%{_arch}
+make -j`nproc`
 popd
 
 %install
@@ -86,11 +84,11 @@ install -D %{_libdir}/libvorbisfile.so* -t %{buildroot}%{_datadir}/%{name}/lib
 install -D %{_libdir}/libopenal.so* -t %{buildroot}%{_datadir}/%{name}/lib
 install -D %{_libdir}/libfreetype.so* -t %{buildroot}%{_datadir}/%{name}/lib
 
-install -D -s libmodplug/build_%{_arch}/libmodplug.so.1* -t %{buildroot}%{_datadir}/%{name}/lib
-patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib love/build_%{_arch}/liblove-12.0.so
-install -D -s love/build_%{_arch}/liblove-12.0.so -t %{buildroot}%{_datadir}/%{name}/lib
-patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib love/build_%{_arch}/%{name}
-install -D -s love/build_%{_arch}/%{name}  %{buildroot}%{_bindir}/%{name}
+install -D -s build_libmodplug_%{_arch}/libmodplug.so.1* -t %{buildroot}%{_datadir}/%{name}/lib
+patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/liblove-12.0.so
+install -D -s build_love_%{_arch}/liblove-12.0.so -t %{buildroot}%{_datadir}/%{name}/lib
+patchelf --force-rpath --set-rpath %{_datadir}/%{name}/lib build_love_%{_arch}/%{name}
+install -D -s build_love_%{_arch}/%{name}  %{buildroot}%{_bindir}/%{name}
 install -m 655 -D icons/86.png  %{buildroot}%{_datadir}/icons/hicolor/86x86/apps/%{name}.png
 install -m 655 -D icons/108.png %{buildroot}%{_datadir}/icons/hicolor/108x108/apps/%{name}.png
 install -m 655 -D icons/128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/%{name}.png
