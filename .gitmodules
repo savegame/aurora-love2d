@@ -1,0 +1,12 @@
+[submodule "LuaJIT"]
+	path = LuaJIT
+	url = https://github.com/LuaJIT/LuaJIT.git
+	branch = v2.1
+[submodule "libmodplug"]
+	path = libmodplug
+	url = https://github.com/savegame/libmodplug.git
+	branch = master
+[submodule "love"]
+	path = love
+	url = git@github.com:savegame/love.git
+	branch = 12_sailfish
