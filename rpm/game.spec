@@ -29,6 +29,7 @@ BuildRequires: pkgconfig(vorbis)
 BuildRequires: pkgconfig(zlib)
 BuildRequires: pkgconfig(freetype2)
 BuildRequires: pkgconfig(libmpg123)
+BuildRequires: pkgconfig(wayland-client)
 BuildRequires: rsync
 BuildRequires: patchelf
 
