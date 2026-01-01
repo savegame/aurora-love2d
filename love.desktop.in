@@ -9,13 +9,9 @@ Icon=__ORGNAME__.__APPNAME__
 Exec=__ORGNAME__.__APPNAME__ /usr/share/__ORGNAME__.__APPNAME__/game.love
 
 [X-Application]
-Permissions=Internet;Audio
+Permissions=Audio
 OrganizationName=__ORGNAME__
 ApplicationName=__APPNAME__
 
-[X-Aurora-SplashScreen]
-GradientStartColor=#B90E0E
-GradientEndColor=#80B9F5
-
 [X-Aurora-Application]
-Orientation=Landscape
+Orientation=LandscapeInverted;Landscape

@@ -26,10 +26,13 @@ BuildRequires: pkgconfig(wayland-egl)
 BuildRequires: pkgconfig(wayland-protocols)
 BuildRequires: pkgconfig(wayland-scanner)
 BuildRequires: pkgconfig(glesv2)
+BuildRequires: pkgconfig(glesv1_cm)
 BuildRequires: pkgconfig(xkbcommon)
 BuildRequires: pkgconfig(vulkan)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(sdl2)
+BuildRequires: pkgconfig(gbm)
+BuildRequires: pkgconfig(udev)
 BuildRequires: rsync
 BuildRequires: patchelf
 BuildRequires: zip
@@ -73,7 +76,7 @@ make DESTDIR=`pwd` install
 popd 
 
 pushd build/%{_arch}/LuaJIT
-make -j`nproc`
+make CFLAGS="-fPIC"  -j`nproc`
 popd
 # update scripts
 pushd love/src/scripts
